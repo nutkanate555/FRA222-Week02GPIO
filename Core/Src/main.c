@@ -284,20 +284,22 @@ void ButtonMatrixUpdate()
 		for(i = 0;i<4;i++)
 		{
 			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixPort[i], ButtonMatrixPin[i]);
-			if(PinState == GPIO_PIN_RESET) // Button Press
+			if(PinState == GPIO_PIN_RESET) // Button Press   /// Save bit
 			{
-				ButtonMatrixState |= (uint16_t)0x1 << (i + ButtonMatrixRow * 4);
+				ButtonMatrixState |= (uint16_t)0x1 << (i + ButtonMatrixRow * 4);        ///// 0b00010000 & 0b???0???? = 0b???1????
 			}
 			else
 			{
-				ButtonMatrixState &= ~((uint16_t)0x1 << (i + ButtonMatrixRow * 4));
+				ButtonMatrixState &= ~((uint16_t)0x1 << (i + ButtonMatrixRow * 4));     ///// 0b11110111 & 0b???????? = 0b????0???
 			}
 		}
+		///Setting for this loop to 1
 		uint8_t NowOutputPin = ButtonMatrixRow + 4 ;
-
 		HAL_GPIO_WritePin(ButtonMatrixPort[NowOutputPin], ButtonMatrixPin[NowOutputPin], GPIO_PIN_SET);
-		ButtonMatrixRow = (ButtonMatrixRow+1)%4 ;
 
+
+		///Setting for next loop to 0
+		ButtonMatrixRow = (ButtonMatrixRow+1)%4 ;
 		uint8_t NextOutputPin = ButtonMatrixRow + 4 ;
 		HAL_GPIO_WritePin(ButtonMatrixPort[NextOutputPin], ButtonMatrixPin[NextOutputPin], GPIO_PIN_RESET);
 	}
