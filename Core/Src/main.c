@@ -49,7 +49,8 @@ uint16_t ButtonMatrixState = 0;
 
 // button_timestamp
 uint32_t ButtonTimeStamp = 0;
-
+uint32_t code_state = 0;
+uint32_t TimeStamp = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -99,6 +100,44 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  enum _INPUT_State
+  {
+	INPUT_State_0 = 0,
+	INPUT_State_1,
+	INPUT_State_2,
+	INPUT_State_3,
+	INPUT_State_4,
+	INPUT_State_5,
+	INPUT_State_6,
+	INPUT_State_7,
+	INPUT_State_8,
+	INPUT_State_9,
+	INPUT_State_10,
+	INPUT_State_11,
+	INPUT_State_Corect,
+	INPUT_State_Error,
+  };
+
+  enum _INPUT_Number
+  {
+	  INPUT_Number_1 = 0b100000000,
+	  INPUT_Number_2 = 0b1000000000,
+	  INPUT_Number_3 = 0b10000000000,
+	  INPUT_Number_4 = 0b10000,
+	  INPUT_Number_5 = 0b100000,
+	  INPUT_Number_6 = 0b1000000,
+	  INPUT_Number_7 = 0b1,
+	  INPUT_Number_8 = 0b10,
+	  INPUT_Number_9 = 0b100,
+	  INPUT_Number_0 = 0b1000000000000,
+	  INPUT_Number_Clear = 0b1000,
+	  INPUT_Number_OK = 0b1000000000000000,
+	  INPUT_Number_No_response = 0b0
+  };
+
+  uint16_t data_array[4];
+  uint8_t ACCESS = 1;
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 
   /* USER CODE END 2 */
 
@@ -110,6 +149,250 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  ButtonMatrixUpdate();
+
+	  data_array[3] = data_array[2];
+	  data_array[2] = data_array[1];
+	  data_array[1] = data_array[0];
+	  data_array[0] = ButtonMatrixState;
+
+
+	  if(ButtonMatrixState == 0b0)
+	  {
+		  ACCESS = 1;
+	  }
+	  if (ACCESS == 1)
+	  {
+		  if ((data_array[3] == data_array[2]) && (data_array[2] == data_array[1]) && (data_array[1] == data_array[0]) && (HAL_GetTick() - TimeStamp >= 500))
+		  {
+			  TimeStamp = HAL_GetTick();
+			  ACCESS = 0;
+				  switch (code_state)
+			  {
+				  case INPUT_State_0:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_6)
+					  {
+						code_state = INPUT_State_1;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+				  break;
+
+				  case INPUT_State_1:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_2)
+					  {
+						code_state = INPUT_State_2;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+				  break;
+
+				  case INPUT_State_2:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_3)
+					  {
+						code_state = INPUT_State_3;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+				  break;
+
+				  case INPUT_State_3:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_4)
+					  {
+						code_state = INPUT_State_4;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+				  break;
+
+				  case INPUT_State_4:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_0)
+					  {
+						code_state = INPUT_State_5;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+				  break;
+
+				  case INPUT_State_5:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_5)
+						  {
+							code_state = INPUT_State_6;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_6:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_0)
+						  {
+							code_state = INPUT_State_7;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_7:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_0)
+						  {
+							code_state = INPUT_State_8;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_8:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_0)
+						  {
+							code_state = INPUT_State_9;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_9:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_1)
+						  {
+							code_state = INPUT_State_10;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_10:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_7)
+						  {
+							code_state = INPUT_State_11;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_11:
+					  {
+						  if (ButtonMatrixState == INPUT_Number_OK)
+						  {
+							code_state = INPUT_State_Corect;
+						  }
+						  else if (ButtonMatrixState == INPUT_Number_No_response)
+						  {
+							break;
+						  }
+						  else
+						  {
+							code_state = INPUT_State_Error;
+						  }
+					  }
+					  break;
+
+					  case INPUT_State_Corect:
+					  {
+						  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+					  }
+					  break;
+
+					  case INPUT_State_Error:
+					  {
+						  break;
+					  }
+					  break;
+
+				  }
+			  if (ButtonMatrixState == INPUT_Number_Clear)
+			  {
+				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+				  code_state = INPUT_State_0;
+			  }
+	  }
+  }
+
 
   }
   /* USER CODE END 3 */
@@ -277,7 +560,7 @@ uint8_t ButtonMatrixRow = 0;
 
 void ButtonMatrixUpdate()
 {
-	if(HAL_GetTick() - ButtonTimeStamp >= 100)
+	if(HAL_GetTick() - ButtonTimeStamp >= 20)
 	{
 		ButtonTimeStamp = HAL_GetTick();
 		int i;
@@ -286,7 +569,7 @@ void ButtonMatrixUpdate()
 			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixPort[i], ButtonMatrixPin[i]);
 			if(PinState == GPIO_PIN_RESET) // Button Press   /// Save bit
 			{
-				ButtonMatrixState |= (uint16_t)0x1 << (i + ButtonMatrixRow * 4);        ///// 0b00010000 & 0b???0???? = 0b???1????
+				ButtonMatrixState |= (uint16_t)0x1 << (i + ButtonMatrixRow * 4);        ///// 0b00010000 | 0b???0???? = 0b???1????
 			}
 			else
 			{
