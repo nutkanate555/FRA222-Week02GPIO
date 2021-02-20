@@ -50,7 +50,9 @@ uint16_t ButtonMatrixState = 0;
 // button_timestamp
 uint32_t ButtonTimeStamp = 0;
 uint32_t code_state = 0;
-uint32_t TimeStamp = 0;
+uint8_t ACCESS = 1;
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -136,7 +138,7 @@ int main(void)
   };
 
   uint16_t data_array[4];
-  uint8_t ACCESS = 1;
+
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
 
   /* USER CODE END 2 */
@@ -156,23 +158,109 @@ int main(void)
 	  data_array[0] = ButtonMatrixState;
 
 
-	  if(ButtonMatrixState == 0b0)
+	  if ((data_array[3] == data_array[2]) && (data_array[2] == data_array[1])
+	  		&& (data_array[1] == data_array[0]) && (data_array[0] == 0b0)&& (ACCESS == 0))
 	  {
 		  ACCESS = 1;
 	  }
-	  if (ACCESS == 1)
+
+
+	  if ((data_array[3] == data_array[2]) && (data_array[2] == data_array[1])
+			  && (data_array[1] == data_array[0]) && (data_array[0] != 0b0) && (ACCESS == 1))
 	  {
-		  if ((data_array[3] == data_array[2]) && (data_array[2] == data_array[1]) && (data_array[1] == data_array[0]) && (HAL_GetTick() - TimeStamp >= 500))
+		  ACCESS = 0;
+			  switch (code_state)
 		  {
-			  TimeStamp = HAL_GetTick();
-			  ACCESS = 0;
-				  switch (code_state)
+			  case INPUT_State_0:
 			  {
-				  case INPUT_State_0:
+				  if (ButtonMatrixState == INPUT_Number_6)
 				  {
-					  if (ButtonMatrixState == INPUT_Number_6)
+					code_state = INPUT_State_1;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_1:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_2)
+				  {
+					code_state = INPUT_State_2;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_2:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_3)
+				  {
+					code_state = INPUT_State_3;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_3:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_4)
+				  {
+					code_state = INPUT_State_4;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_4:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_0)
+				  {
+					code_state = INPUT_State_5;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_5:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_5)
 					  {
-						code_state = INPUT_State_1;
+						code_state = INPUT_State_6;
 					  }
 					  else if (ButtonMatrixState == INPUT_Number_No_response)
 					  {
@@ -185,62 +273,28 @@ int main(void)
 				  }
 				  break;
 
-				  case INPUT_State_1:
-				  {
-					  if (ButtonMatrixState == INPUT_Number_2)
-					  {
-						code_state = INPUT_State_2;
-					  }
-					  else if (ButtonMatrixState == INPUT_Number_No_response)
-					  {
-						break;
-					  }
-					  else
-					  {
-						code_state = INPUT_State_Error;
-					  }
-				  }
-				  break;
-
-				  case INPUT_State_2:
-				  {
-					  if (ButtonMatrixState == INPUT_Number_3)
-					  {
-						code_state = INPUT_State_3;
-					  }
-					  else if (ButtonMatrixState == INPUT_Number_No_response)
-					  {
-						break;
-					  }
-					  else
-					  {
-						code_state = INPUT_State_Error;
-					  }
-				  }
-				  break;
-
-				  case INPUT_State_3:
-				  {
-					  if (ButtonMatrixState == INPUT_Number_4)
-					  {
-						code_state = INPUT_State_4;
-					  }
-					  else if (ButtonMatrixState == INPUT_Number_No_response)
-					  {
-						break;
-					  }
-					  else
-					  {
-						code_state = INPUT_State_Error;
-					  }
-				  }
-				  break;
-
-				  case INPUT_State_4:
+			  case INPUT_State_6:
 				  {
 					  if (ButtonMatrixState == INPUT_Number_0)
 					  {
-						code_state = INPUT_State_5;
+						code_state = INPUT_State_7;
+					  }
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
+					  {
+						break;
+					  }
+					  else
+					  {
+						code_state = INPUT_State_Error;
+					  }
+				  }
+			  break;
+
+			  case INPUT_State_7:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_0)
+					  {
+						code_state = INPUT_State_8;
 					  }
 					  else if (ButtonMatrixState == INPUT_Number_No_response)
 					  {
@@ -253,145 +307,100 @@ int main(void)
 				  }
 				  break;
 
-				  case INPUT_State_5:
+				  case INPUT_State_8:
+				  {
+					  if (ButtonMatrixState == INPUT_Number_0)
 					  {
-						  if (ButtonMatrixState == INPUT_Number_5)
-						  {
-							code_state = INPUT_State_6;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
+						code_state = INPUT_State_9;
 					  }
-					  break;
-
-					  case INPUT_State_6:
+					  else if (ButtonMatrixState == INPUT_Number_No_response)
 					  {
-						  if (ButtonMatrixState == INPUT_Number_0)
-						  {
-							code_state = INPUT_State_7;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
+						break;
 					  }
-					  break;
-
-					  case INPUT_State_7:
+					  else
 					  {
-						  if (ButtonMatrixState == INPUT_Number_0)
-						  {
-							code_state = INPUT_State_8;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
+						code_state = INPUT_State_Error;
 					  }
-					  break;
-
-					  case INPUT_State_8:
-					  {
-						  if (ButtonMatrixState == INPUT_Number_0)
-						  {
-							code_state = INPUT_State_9;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
-					  }
-					  break;
-
-					  case INPUT_State_9:
-					  {
-						  if (ButtonMatrixState == INPUT_Number_1)
-						  {
-							code_state = INPUT_State_10;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
-					  }
-					  break;
-
-					  case INPUT_State_10:
-					  {
-						  if (ButtonMatrixState == INPUT_Number_7)
-						  {
-							code_state = INPUT_State_11;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
-					  }
-					  break;
-
-					  case INPUT_State_11:
-					  {
-						  if (ButtonMatrixState == INPUT_Number_OK)
-						  {
-							code_state = INPUT_State_Corect;
-						  }
-						  else if (ButtonMatrixState == INPUT_Number_No_response)
-						  {
-							break;
-						  }
-						  else
-						  {
-							code_state = INPUT_State_Error;
-						  }
-					  }
-					  break;
-
-					  case INPUT_State_Corect:
-					  {
-						  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-					  }
-					  break;
-
-					  case INPUT_State_Error:
-					  {
-						  break;
-					  }
-					  break;
-
 				  }
-			  if (ButtonMatrixState == INPUT_Number_Clear)
+				  break;
+
+			  case INPUT_State_9:
 			  {
-				  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
-				  code_state = INPUT_State_0;
+				  if (ButtonMatrixState == INPUT_Number_1)
+				  {
+					code_state = INPUT_State_10;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
 			  }
+			  break;
+
+			  case INPUT_State_10:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_7)
+				  {
+					code_state = INPUT_State_11;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_11:
+			  {
+				  if (ButtonMatrixState == INPUT_Number_OK)
+				  {
+					code_state = INPUT_State_Corect;
+				  }
+				  else if (ButtonMatrixState == INPUT_Number_No_response)
+				  {
+					break;
+				  }
+				  else
+				  {
+					code_state = INPUT_State_Error;
+				  }
+			  }
+			  break;
+
+			  case INPUT_State_Corect:
+			  {
+				  break;
+			  }
+			  break;
+
+			  case INPUT_State_Error:
+			  {
+				  break;
+			  }
+			  break;
+
+
+			  }
+
+		  if (ButtonMatrixState == INPUT_Number_Clear)
+		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+			  code_state = INPUT_State_0;
+		  }
+		  if (code_state == INPUT_State_Corect)
+		  {
+			  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+		  }
+
 	  }
-  }
 
 
   }
